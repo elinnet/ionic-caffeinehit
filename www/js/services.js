@@ -1,6 +1,6 @@
 var app = angular.module('caffeinehit.services', []);
 
-app.service("YelpService", function ($q, $http, $cordovaGeolocation) {
+app.service("YelpService", function ($q, $http, $cordovaGeolocation, $ionicPopup) {
 	var self = {
 		'page': 1,
 		'isLoading': false,
@@ -23,34 +23,51 @@ app.service("YelpService", function ($q, $http, $cordovaGeolocation) {
 			self.isLoading = true;
 			var deferred = $q.defer();
 
- //plugin only call when ionic app finished loading
 
-			var params = {
-				page: self.page,
-				lat: self.lat,
-				lon: self.lon
-			};
+		ionic.Platform.ready(function(){
+		    $cordovaGeolocation
+		    .getCurrentPosition({timeout:10000, enableHighAccuracy:false})
+		    .then(function(position){
+		      self.lat = position.coords.latitude;
+		      self.lon = position.coords.longitude;
 
-			$http.get('https://codecraftpro.com/api/samples/v1/coffee/', {params: params})
-				.success(function (data) {
-					self.isLoading = false;
-					console.log(data);
+					var params = {
+						page: self.page,
+						lat: self.lat,
+						lon: self.lon
+					};
 
-					if (data.businesses.length === 0) {
-						self.hasMore = false;
-					} else {
-						angular.forEach(data.businesses, function (business) {
-							self.results.push(business);
+					$http.get('https://codecraftpro.com/api/samples/v1/coffee/', {params: params})
+						.success(function (data) {
+							self.isLoading = false;
+							console.log(data);
+
+							if (data.businesses.length === 0) {
+								self.hasMore = false;
+							} else {
+								angular.forEach(data.businesses, function (business) {
+									self.results.push(business);
+								});
+							}
+
+							deferred.resolve();
+						})
+						.error(function (data, status, headers, config) {
+							self.isLoading = false;
+							deferred.reject(data);
 						});
-					}
 
-					deferred.resolve();
-				})
-				.error(function (data, status, headers, config) {
-					self.isLoading = false;
-					deferred.reject(data);
-				});
+				}, function(err){
+				    console.error("Error getting position");
+				    console.error(err);
+						$ionicPopup.alert({
+							'title': "Please switch on geolocation",
+							'template': "It seems like youve switched off geoloation for CaffeineHit"
+						});
+				}); //this is to close the then function
 
+
+			});//this is to close the 'ionic.Platform.ready' function.plugin only call when ionic app finished loading
 				return deferred.promise;
 			}
 	}; //this is to close var = self
