@@ -1,6 +1,6 @@
 var app = angular.module('caffeinehit.services', []);
 
-app.service("YelpService", function ($q, $http) {
+app.service("YelpService", function ($q, $http, $cordovaGeolocation) {
 	var self = {
 		'page': 1,
 		'isLoading': false,
@@ -22,6 +22,8 @@ app.service("YelpService", function ($q, $http) {
 		'load': function () {
 			self.isLoading = true;
 			var deferred = $q.defer();
+
+ //plugin only call when ionic app finished loading
 
 			var params = {
 				page: self.page,
@@ -49,11 +51,11 @@ app.service("YelpService", function ($q, $http) {
 					deferred.reject(data);
 				});
 
-			return deferred.promise;
-		}
-	};
+				return deferred.promise;
+			}
+	}; //this is to close var = self
 
 	self.load();
 
 	return self;
-});
+}); //this is to close the service "Yelpservice"

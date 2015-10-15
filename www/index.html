@@ -19,6 +19,7 @@
 	<script src="lib/ionic/js/ionic.bundle.js" ></script >
 
 	<!-- cordova script (this will be a 404 during development) -->
+	<script src="lib/ngCordova/dist/ng-cordova.js"></script>
 	<script src="cordova.js" ></script >
 
 
@@ -40,9 +41,10 @@
 	<ion-content >
 		<ion-refresher pulling-text="Pull to refresh" on-refresh="doRefresh()"></ion-refresher>
 
-		<ion-list >
+		<ion-list>
 			<ion-item ng-repeat="cafe in yelp.results"
-			          class="item-thumbnail-left" >
+			          class="item-thumbnail-left"
+								ng-click="openMap(cafe)">
 				<img ng-src="{{cafe.image_url}}" >
 				<h2 >{{cafe.name}}</h2 >
 
@@ -63,8 +65,13 @@
 						<i class="ion ion-person" ></i >
 						{{cafe.review_count}}</span >
 				</p >
+					<ion-option-button class="button" ng-click = "getDirections(cafe)" >
+				 		<i class="ion ion-map">&nbsp;Map</i>
+					</ion>
 			</ion-item >
 		</ion-list >
+		<ion-infinite-scroll ng-if="yelp.hasMore" immediate-check="false" on-infinite="loadMore()" distance="1%">
+		</ion-infinite-scroll>
 	</ion-content >
 </ion-pane >
 </body >
