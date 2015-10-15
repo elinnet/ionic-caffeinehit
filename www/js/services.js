@@ -39,8 +39,10 @@ app.service("YelpService", function ($q, $http, $cordovaGeolocation, $ionicPopup
 
 					$http.get('https://codecraftpro.com/api/samples/v1/coffee/', {params: params})
 						.success(function (data) {
-							self.isLoading = false;
+
 							console.log(data);
+							// console.log(data.businesses[1]);
+							// console.log(data.businesses.length);
 
 							if (data.businesses.length === 0) {
 								self.hasMore = false;
@@ -49,10 +51,11 @@ app.service("YelpService", function ($q, $http, $cordovaGeolocation, $ionicPopup
 									self.results.push(business);
 								});
 							}
-
+							self.isLoading = false;
 							deferred.resolve();
 						})
 						.error(function (data, status, headers, config) {
+							console.log("error");
 							self.isLoading = false;
 							deferred.reject(data);
 						});
